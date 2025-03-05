@@ -1,2 +1,7 @@
 streamlit
 pyedflib
+pandas
+plotly
+mne
+chart_studio
+matplotlib
