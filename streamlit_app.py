@@ -17,6 +17,8 @@ from mne.datasets import sample
 
 from streamlit_shortcuts.streamlit_shortcuts import add_keyboard_shortcuts
 
+EPOCH_SIZE = 600
+
 st.set_page_config(
     page_title="Visualize EEG",
     page_icon=":brain:",
@@ -25,6 +27,9 @@ st.set_page_config(
 )
 
 st.title("Visualize EEG signals")
+
+if "starting" not in st.session_state:
+    st.session_state.starting = 0  # Initialize counter if not present
 
   
 
@@ -77,19 +82,19 @@ n_channels = 20
 # data, times = raw[picks[:n_channels], start:stop]
 # ch_names = [raw.info['ch_names'][p] for p in picks[:n_channels]]
 
-start = 0
-stop = st.session_state.starting*256
-times = np.linspace(start, stop/256, stop)
+start = st.session_state.starting
+stop =  st.session_state.starting + EPOCH_SIZE
+times = np.arange(start, stop, 1.0/256.0)
 
-data = signals[:n_channels,start:stop]
+print ('starting', st.session_state.starting)
+
+data = signals[:n_channels,start*256:stop*256]
 ch_names = [signal_header['label'] for signal_header in signal_headers]
 ch_names = ch_names[:n_channels]
 print ('data shape', data.shape, times.shape)
 # print (times[:100])
 
 
-if "epoch" not in st.session_state:
-    st.session_state.epoch = 600  # Initialize counter if not present, 600 seconds
 
 st.number_input(label="Window size", value=10, key='window_size')
 # if st.button("Right", key="arrowright"):     
@@ -133,7 +138,7 @@ layout.update(annotations=annotations)
 layout.update(autosize=False, width=1000, height=600)
 
 # limit xrange
-layout.update(xaxis=dict(range=[0,st.session_state.window_size]))
+layout.update(xaxis=dict(range=[0,st.session_state.window_size], minallowed=0))
 
 
 fig = Figure(data=Data(traces), layout=layout)
@@ -144,5 +149,13 @@ st.plotly_chart(fig)
 
 
 if st.button("Forward", key="forward"):
-     st.session_state.epoch += 600 # Move to next epoch (next 10mins)
+     st.session_state.starting += EPOCH_SIZE # Move to next epoch (next 10mins)
+     print ('starting+', st.session_state.starting)
+     layout.update(xaxis=dict(range=[st.session_state.starting,st.session_state.starting+st.session_state.window_size], minallowed=st.session_state.starting))
      
+
+if st.button("Reset", key="reset"):
+     st.session_state.starting = 0   
+     print ('starting', st.session_state.starting)  
+     
+          
