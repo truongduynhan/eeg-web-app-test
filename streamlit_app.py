@@ -85,7 +85,7 @@ n_channels = 20
 # ch_names = [raw.info['ch_names'][p] for p in picks[:n_channels]]
 
 start = 0
-stop = 3000*256
+stop = 2000*256
 times = np.linspace(start, stop/256, stop)
 
 data = signals[:n_channels,start:stop]
@@ -99,19 +99,19 @@ if "starting" not in st.session_state:
     st.session_state.starting = 0  # Initialize counter if not present
 
 st.number_input(label="Window size", value=10, key='window_size')
-if st.button("Right", key="arrowright"):     
-     st.write("Clicked right", st.session_state.starting)
-     st.session_state.starting = st.session_state.starting + 1     
-     print ('starting', st.session_state.starting)
+# if st.button("Right", key="arrowright"):     
+#      st.write("Clicked right", st.session_state.starting)
+#      st.session_state.starting = st.session_state.starting + 1     
+#      print ('starting', st.session_state.starting)
 
-add_keyboard_shortcuts({"ctrl+ArrowRight": "Right"})
+# add_keyboard_shortcuts({"ctrl+ArrowRight": "Right"})
 
-if st.button("Left", key="arrowleft"):     
-     st.write("Clicked left", st.session_state.starting)
-     st.session_state.starting = st.session_state.starting - 1
-     print ('starting', st.session_state.starting)
+# if st.button("Left", key="arrowleft"):     
+#      st.write("Clicked left", st.session_state.starting)
+#      st.session_state.starting = st.session_state.starting - 1
+#      print ('starting', st.session_state.starting)
 
-add_keyboard_shortcuts({"ctrl+ArrowLeft": "Left"})
+# add_keyboard_shortcuts({"ctrl+ArrowLeft": "Left"})
 
 step = 1. / n_channels
 kwargs = dict(domain=[1 - step, 1], showticklabels=False, zeroline=False, showgrid=False, fixedrange= True)
@@ -140,7 +140,7 @@ layout.update(annotations=annotations)
 layout.update(autosize=False, width=1000, height=600)
 
 # limit xrange
-layout.update(xaxis=dict(range=[st.session_state.starting,st.session_state.starting+st.session_state.window_size]))
+layout.update(xaxis=dict(range=[0,st.session_state.window_size]))
 
 
 fig = Figure(data=Data(traces), layout=layout)
@@ -149,8 +149,8 @@ print ('plotly_chart')
 
 st.plotly_chart(fig)
 
-_start = 0
+# _start = 0
 
-if st.button("Forward", key="forward"):
-     _start += 1
-     layout.update(xaxis=dict(range=[_start, _start + st.session_state.window_size]))
+# if st.button("Forward", key="forward"):
+#      _start += 1
+#      layout.update(xaxis=dict(range=[_start, _start + st.session_state.window_size]))
