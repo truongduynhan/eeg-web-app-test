@@ -69,14 +69,20 @@ start, stop = raw.time_as_index([0, 10])
 n_channels = 20
 data, times = raw[picks[:n_channels], start:stop]
 ch_names = [raw.info['ch_names'][p] for p in picks[:n_channels]]
+
+data = signals[:n_channels,start:stop]
+ch_names = [signal_header['label'] for signal_header in signal_headers]
+ch_names = ch_names[:n_channels]
 print ('data shape', data.shape, times.shape)
 # print (times[:100])
 
 step = 1. / n_channels
-kwargs = dict(domain=[1 - step, 1], showticklabels=False, zeroline=False, showgrid=False)
+kwargs = dict(domain=[1 - step, 1], showticklabels=False, zeroline=False, showgrid=False, fixedrange= True)
 
 # create objects for layout and traces
-layout = Layout(yaxis=YAxis(kwargs), showlegend=False, xaxis=dict(showticklabels=True, position=0))
+layout = Layout(yaxis=YAxis(kwargs), showlegend=False, 
+                xaxis=dict(showticklabels=True, position=0),
+                dragmode="pan")
 traces = [Scatter(x=times, y=data.T[:, 0])]
 
 # loop over the channels
@@ -90,19 +96,15 @@ layout.update(margin=dict(l=60))
 # add channel names using Annotations
 annotations = Annotations([Annotation(x=0, y=0, xanchor='left', xref='paper', xshift=-60, yref='y%d' % (ii + 1),
                                       text=ch_name, font=Font(size=12), showarrow=False)
-                          for ii, ch_name in enumerate(ch_names)] 
-                        #   + 
-                        #   [Annotation(x=-0.08, y=-0.05, xref='x%d' % (iii + 1), yref='paper',
-                        #               text=ch_name, font=Font(size=12), showarrow=False)
-                        #   for iii, ch_name in enumerate(times[::1000])]
-                          )
+                          for ii, ch_name in enumerate(ch_names)])
 layout.update(annotations=annotations)
 
 # set the size of the figure and plot it
 layout.update(autosize=False, width=1000, height=600)
 
-# set position of x ticks
-layout.update(xaxis=dict(tick0=2))
+# limit xrange
+layout.update(xaxis=dict(range=[0,2]))
+
 
 fig = Figure(data=Data(traces), layout=layout)
 # py.iplot(fig, filename='shared xaxis')
