@@ -88,7 +88,7 @@ for ii in range(1, n_channels):
 # layout.update(margin=dict(l=70))
 
 # add channel names using Annotations
-annotations = Annotations([Annotation(x=-0.08, y=0, xanchor='left', xref='paper', yref='y%d' % (ii + 1),
+annotations = Annotations([Annotation(x=0, y=0, xanchor='left', xref='paper', yref='y%d' % (ii + 1),
                                       text=ch_name, font=Font(size=12), showarrow=False)
                           for ii, ch_name in enumerate(ch_names)] 
                         #   + 
