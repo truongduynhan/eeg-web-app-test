@@ -17,7 +17,7 @@ from mne.datasets import sample
 
 from streamlit_shortcuts.streamlit_shortcuts import add_keyboard_shortcuts
 
-EPOCH_SIZE = 600
+EPOCH_SIZE = 20
 
 st.set_page_config(
     page_title="Visualize EEG",
@@ -82,6 +82,12 @@ n_channels = 20
 # data, times = raw[picks[:n_channels], start:stop]
 # ch_names = [raw.info['ch_names'][p] for p in picks[:n_channels]]
 
+st.number_input(label="Window size", value=10, key='window_size')
+
+if st.button("Forward", key="forward"):
+     st.session_state.starting += EPOCH_SIZE # Move to next epoch (next 10mins)
+     print ('starting+', st.session_state.starting)   
+
 start = st.session_state.starting
 stop =  st.session_state.starting + EPOCH_SIZE
 times = np.arange(start, stop, 1.0/256.0)
@@ -96,7 +102,7 @@ print ('data shape', data.shape, times.shape)
 
 
 
-st.number_input(label="Window size", value=10, key='window_size')
+
 # if st.button("Right", key="arrowright"):     
 #      st.write("Clicked right", st.session_state.starting)
 #      st.session_state.starting = st.session_state.starting + 1     
@@ -138,7 +144,10 @@ layout.update(annotations=annotations)
 layout.update(autosize=False, width=1000, height=600)
 
 # limit xrange
-layout.update(xaxis=dict(range=[0,st.session_state.window_size], minallowed=0))
+layout.update(xaxis=dict(range=[st.session_state.starting,st.session_state.starting+st.session_state.window_size],
+                         minallowed=st.session_state.starting,
+                         maxallowed=st.session_state.starting+EPOCH_SIZE,
+                         ))
 
 
 fig = Figure(data=Data(traces), layout=layout)
@@ -148,10 +157,7 @@ print ('plotly_chart')
 st.plotly_chart(fig)
 
 
-if st.button("Forward", key="forward"):
-     st.session_state.starting += EPOCH_SIZE # Move to next epoch (next 10mins)
-     print ('starting+', st.session_state.starting)
-     layout.update(xaxis=dict(range=[st.session_state.starting,st.session_state.starting+st.session_state.window_size], minallowed=st.session_state.starting))
+  
      
 
 if st.button("Reset", key="reset"):
