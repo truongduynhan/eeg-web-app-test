@@ -5,7 +5,8 @@ import streamlit as st
 @st.cache_data
 def load_raw_data(fn):
     signals, signal_headers, header = highlevel.read_edf(fn)
-    return signals, signal_headers, header
+    ch_names = [signal_header['label'] for signal_header in signal_headers]
+    return signals, ch_names, signal_headers, header
 
 if __name__ == '__main__':
     fn = 'data/chb01_03.edf'

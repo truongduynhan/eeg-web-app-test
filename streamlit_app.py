@@ -9,8 +9,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import chart_studio.plotly as py
 
+from plotly import tools
+from plotly.graph_objs import Layout, YAxis, Scatter, Annotation, Annotations, Data, Figure, Marker, Font
+
 import mne  # If this line returns an error, uncomment the following line
 from mne.datasets import sample
+
+from streamlit_shortcuts.streamlit_shortcuts import add_keyboard_shortcuts
 
 st.set_page_config(
     page_title="Visualize EEG",
@@ -21,9 +26,18 @@ st.set_page_config(
 
 st.title("Visualize EEG signals")
 
+# Initialization
+if 'key' not in st.session_state:
+    st.session_state['key'] = 'initvalue'
+
+# Session State also supports attribute based syntax
+if 'key' not in st.session_state:
+    st.session_state.key = 'initvalue'
+   
+
 fn = 'data/chb01_01.edf'
 if os.path.isfile(fn):
-    signals, signal_headers, header = load_raw_data(fn)
+    signals, ch_names, signal_headers, header = load_raw_data(fn)
     st.write ('Main: Signal shape {}'.format(signals.shape))
     for signal_header in signal_headers:
         print (signal_header['label'], signal_header['sample_frequency'])
@@ -60,11 +74,11 @@ raw = mne.io.Raw(raw_fname, preload=False)
 print(raw)
 print(raw.ch_names[:5])
 
-from plotly import tools
-from plotly.graph_objs import Layout, YAxis, Scatter, Annotation, Annotations, Data, Figure, Marker, Font
+# fig1 = raw.plot()
+# st.pyplot(fig1)
 
 picks = mne.pick_types(raw.info, meg='grad', exclude=[])
-start, stop = raw.time_as_index([0, 10])
+start, stop = raw.time_as_index([0, 1000])
 
 n_channels = 20
 data, times = raw[picks[:n_channels], start:stop]
@@ -75,6 +89,25 @@ ch_names = [signal_header['label'] for signal_header in signal_headers]
 ch_names = ch_names[:n_channels]
 print ('data shape', data.shape, times.shape)
 # print (times[:100])
+
+
+if "starting" not in st.session_state:
+    st.session_state.starting = 0  # Initialize counter if not present
+
+st.number_input(label="Window size", value=2, key='window_size')
+if st.button("Right", key="arrowright"):     
+     st.write("Clicked right", st.session_state.starting)
+     st.session_state.starting = st.session_state.starting + 1     
+     print ('starting', st.session_state.starting)
+
+add_keyboard_shortcuts({"ctrl+ArrowRight": "Right"})
+
+if st.button("Left", key="arrowleft"):     
+     st.write("Clicked left", st.session_state.starting)
+     st.session_state.starting = st.session_state.starting - 1
+     print ('starting', st.session_state.starting)
+
+add_keyboard_shortcuts({"ctrl+ArrowLeft": "Left"})
 
 step = 1. / n_channels
 kwargs = dict(domain=[1 - step, 1], showticklabels=False, zeroline=False, showgrid=False, fixedrange= True)
@@ -103,10 +136,17 @@ layout.update(annotations=annotations)
 layout.update(autosize=False, width=1000, height=600)
 
 # limit xrange
-layout.update(xaxis=dict(range=[0,2]))
+layout.update(xaxis=dict(range=[st.session_state.starting,st.session_state.starting+st.session_state.window_size]))
 
 
 fig = Figure(data=Data(traces), layout=layout)
 # py.iplot(fig, filename='shared xaxis')
 print ('plotly_chart')
+
 st.plotly_chart(fig)
+
+_start = 0
+
+if st.button("Forward", key="forward"):
+     _start += 1
+     layout.update(xaxis=dict(range=[_start, _start + st.session_state.window_size]))
