@@ -67,22 +67,26 @@ st.write ('Done!')
 # st.plotly_chart(fig_combined)
 
 
-data_path = sample.data_path()
+# data_path = sample.data_path()
 
-raw_fname =  '{}/MEG/sample/sample_audvis_filt-0-40_raw.fif'.format(data_path)
-raw = mne.io.Raw(raw_fname, preload=False)
-print(raw)
-print(raw.ch_names[:5])
+# raw_fname =  '{}/MEG/sample/sample_audvis_filt-0-40_raw.fif'.format(data_path)
+# raw = mne.io.Raw(raw_fname, preload=False)
+# print(raw)
+# print(raw.ch_names[:5])
 
 # fig1 = raw.plot()
 # st.pyplot(fig1)
 
-picks = mne.pick_types(raw.info, meg='grad', exclude=[])
-start, stop = raw.time_as_index([0, 1000])
+# picks = mne.pick_types(raw.info, meg='grad', exclude=[])
+# start, stop = raw.time_as_index([0, 1000])
 
 n_channels = 20
-data, times = raw[picks[:n_channels], start:stop]
-ch_names = [raw.info['ch_names'][p] for p in picks[:n_channels]]
+# data, times = raw[picks[:n_channels], start:stop]
+# ch_names = [raw.info['ch_names'][p] for p in picks[:n_channels]]
+
+start = 0
+stop = 1000
+times = np.linspace(start, stop, stop*256) 
 
 data = signals[:n_channels,start:stop]
 ch_names = [signal_header['label'] for signal_header in signal_headers]
