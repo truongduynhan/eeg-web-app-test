@@ -85,8 +85,8 @@ n_channels = 20
 # ch_names = [raw.info['ch_names'][p] for p in picks[:n_channels]]
 
 start = 0
-stop = 1000
-times = np.linspace(start, stop, stop*256) 
+stop = 3000*256
+times = np.linspace(start, stop/256, stop)
 
 data = signals[:n_channels,start:stop]
 ch_names = [signal_header['label'] for signal_header in signal_headers]
@@ -98,7 +98,7 @@ print ('data shape', data.shape, times.shape)
 if "starting" not in st.session_state:
     st.session_state.starting = 0  # Initialize counter if not present
 
-st.number_input(label="Window size", value=2, key='window_size')
+st.number_input(label="Window size", value=10, key='window_size')
 if st.button("Right", key="arrowright"):     
      st.write("Clicked right", st.session_state.starting)
      st.session_state.starting = st.session_state.starting + 1     
