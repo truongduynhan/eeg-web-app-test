@@ -26,14 +26,7 @@ st.set_page_config(
 
 st.title("Visualize EEG signals")
 
-# Initialization
-if 'key' not in st.session_state:
-    st.session_state['key'] = 'initvalue'
-
-# Session State also supports attribute based syntax
-if 'key' not in st.session_state:
-    st.session_state.key = 'initvalue'
-   
+  
 
 fn = 'data/chb01_01.edf'
 if os.path.isfile(fn):
@@ -85,7 +78,7 @@ n_channels = 20
 # ch_names = [raw.info['ch_names'][p] for p in picks[:n_channels]]
 
 start = 0
-stop = 2000*256
+stop = st.session_state.starting*256
 times = np.linspace(start, stop/256, stop)
 
 data = signals[:n_channels,start:stop]
@@ -95,8 +88,8 @@ print ('data shape', data.shape, times.shape)
 # print (times[:100])
 
 
-if "starting" not in st.session_state:
-    st.session_state.starting = 0  # Initialize counter if not present
+if "epoch" not in st.session_state:
+    st.session_state.epoch = 600  # Initialize counter if not present, 600 seconds
 
 st.number_input(label="Window size", value=10, key='window_size')
 # if st.button("Right", key="arrowright"):     
@@ -149,8 +142,7 @@ print ('plotly_chart')
 
 st.plotly_chart(fig)
 
-# _start = 0
 
-# if st.button("Forward", key="forward"):
-#      _start += 1
-#      layout.update(xaxis=dict(range=[_start, _start + st.session_state.window_size]))
+if st.button("Forward", key="forward"):
+     st.session_state.epoch += 600 # Move to next epoch (next 10mins)
+     
