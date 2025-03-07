@@ -17,7 +17,7 @@ from mne.datasets import sample
 
 from streamlit_shortcuts.streamlit_shortcuts import add_keyboard_shortcuts
 
-EPOCH_SIZE = 20
+EPOCH_SIZE = 300
 
 st.set_page_config(
     page_title="Visualize EEG",
@@ -147,6 +147,7 @@ layout.update(autosize=False, width=1000, height=600)
 layout.update(xaxis=dict(range=[st.session_state.starting,st.session_state.starting+st.session_state.window_size],
                          minallowed=st.session_state.starting,
                          maxallowed=st.session_state.starting+EPOCH_SIZE,
+                         
                          ))
 
 
