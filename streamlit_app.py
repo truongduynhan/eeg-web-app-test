@@ -1,6 +1,7 @@
 import streamlit as st
 from data_load import load_raw_data
 import os
+from datetime import datetime, timedelta
 
 import plotly.graph_objs as go
 import pandas as pd
@@ -17,7 +18,7 @@ from plotly.graph_objs import Layout, YAxis, Scatter, Scattergl, Annotation, Ann
 
 from streamlit_shortcuts.streamlit_shortcuts import add_keyboard_shortcuts
 
-EPOCH_SIZE = 600
+EPOCH_SIZE = 300
 
 st.set_page_config(
     page_title="Visualize EEG",
@@ -84,12 +85,14 @@ start = st.session_state.starting
 stop =  min(st.session_state.starting + EPOCH_SIZE, max_time)
 times = np.arange(start, stop, 1.0/256.0)
 
+times = [datetime.strptime('2013-02-26', '%Y-%m-%d') + timedelta(seconds=_time) for _time in times]
+# print (times[:10])
 print ('starting', st.session_state.starting)
 
 data = signals[:n_channels,start*256:stop*256] * st.session_state.scale_signal
 ch_names = [signal_header['label'] for signal_header in signal_headers]
 ch_names = ch_names[:n_channels]
-print ('data shape', data.shape, times.shape)
+# print ('data shape', data.shape, times.shape)
 # print (times[:100])
 
 
@@ -142,11 +145,40 @@ layout.update(annotations=annotations)
 layout.update(autosize=False, width=1000, height=800)
 
 # limit xrange
-layout.update(xaxis=dict(range=[st.session_state.starting,st.session_state.starting+st.session_state.window_size],
-                        #  minallowed=st.session_state.starting,
-                        #  maxallowed=st.session_state.starting+EPOCH_SIZE,
-                         rangemode='tozero',
+layout.update(xaxis=dict(range=[datetime.strptime('2013-02-26', '%Y-%m-%d') + timedelta(seconds=st.session_state.starting),
+                                datetime.strptime('2013-02-26', '%Y-%m-%d') + timedelta(seconds=st.session_state.starting+st.session_state.window_size)],                      
                          ))
+
+# Add range slider
+layout.update(
+    xaxis=dict(
+        rangeselector=dict(
+            buttons=list([
+                dict(count=5,
+                     label="5s",
+                     step="second",
+                     stepmode="todate"),
+                dict(count=10,
+                     label="10s",
+                     step="second",
+                     stepmode="todate"),
+                dict(count=20,
+                     label="20s",
+                     step="second",
+                     stepmode="todate"),
+                dict(count=1,
+                     label="60s",
+                     step="minute",
+                     stepmode="todate"),
+                dict(step="all")
+            ])
+        ),
+        rangeslider=dict(
+            visible=True
+        ),
+        type="date"
+    )
+)
 
 
 fig = Figure(data=Data(traces), layout=layout)

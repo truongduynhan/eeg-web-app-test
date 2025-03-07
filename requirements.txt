@@ -6,3 +6,4 @@ mne
 chart_studio
 matplotlib
 streamlit_shortcuts
+datetime
