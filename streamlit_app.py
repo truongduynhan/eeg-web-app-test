@@ -139,7 +139,7 @@ annotations = Annotations([Annotation(x=0, y=0, xanchor='left', xref='paper', xs
 layout.update(annotations=annotations)
 
 # set the size of the figure and plot it
-layout.update(autosize=False, width=1000, height=1000)
+layout.update(autosize=False, width=1000, height=800)
 
 # limit xrange
 layout.update(xaxis=dict(range=[st.session_state.starting,st.session_state.starting+st.session_state.window_size],
