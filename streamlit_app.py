@@ -174,7 +174,7 @@ layout.update(
             ])
         ),
         rangeslider=dict(
-            visible=True
+            # visible=True
         ),
         type="date"
     )
